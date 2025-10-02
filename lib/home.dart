@@ -1,3 +1,4 @@
+// lib/home.dart
 import 'package:flutter/material.dart';
 import 'model/products_repository.dart';
 import 'model/product.dart';
@@ -8,45 +9,37 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<Product> products =
+        ProductsRepository.loadProducts(Category.all);
+
     return Scaffold(
-      // ✅ Top App Bar
       appBar: AppBar(
         title: const Text('SHRINE'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search (future step)
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.tune),
-            onPressed: () {
-              // TODO: Implement filter (future step)
-            },
+            onPressed: () {},
           ),
         ],
       ),
-
-      // ✅ Grid Produk
-      body: GridView.count(
-        crossAxisCount: 2, // 2 kolom
+      //
+      body: GridView.builder(
         padding: const EdgeInsets.all(16.0),
-        childAspectRatio: 8.0 / 9.0, // ukuran card
-        children: _buildGridCards(context),
+        itemCount: products.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // dua kolom
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
+          childAspectRatio: 0.6, //
+        ),
+        itemBuilder: (context, index) {
+          return ProductCard(product: products[index]);
+        },
       ),
     );
-  }
-
-  List<Widget> _buildGridCards(BuildContext context) {
-    List<Product> products = ProductsRepository.loadProducts(Category.all);
-
-    if (products.isEmpty) {
-      return const <Card>[];
-    }
-
-    return products.map((product) {
-      return ProductCard(product: product);
-    }).toList();
   }
 }
