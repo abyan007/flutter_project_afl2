@@ -1,45 +1,47 @@
-// lib/home.dart
 import 'package:flutter/material.dart';
 import 'model/products_repository.dart';
 import 'model/product.dart';
-import 'supplemental/product_card.dart';
+import 'supplemental/asymmetric_view.dart';
+import 'backdrop.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final List<Product> products =
-        ProductsRepository.loadProducts(Category.all);
+  State<HomePage> createState() => _HomePageState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SHRINE'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            onPressed: () {},
-          ),
-        ],
+class _HomePageState extends State<HomePage> {
+  Category _currentCategory = Category.all;
+
+  @override
+  Widget build(BuildContext context) {
+    return Backdrop(
+      frontLayer: AsymmetricView(
+        products: ProductsRepository.loadProducts(_currentCategory),
       ),
-      //
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: products.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // dua kolom
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: 0.6, //
-        ),
-        itemBuilder: (context, index) {
-          return ProductCard(product: products[index]);
-        },
-      ),
+      backLayer: _buildCategoryMenu(),
+      frontTitle: const Text('SHRINE'),
+      backTitle: const Text('MENU'),
+    );
+  }
+
+  Widget _buildCategoryMenu() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      children: Category.values.map((category) {
+        return ListTile(
+          title: Text(
+            category.toString().split('.').last.toUpperCase(),
+          ),
+          selected: _currentCategory == category,
+          onTap: () {
+            setState(() {
+              _currentCategory = category;
+            });
+          },
+        );
+      }).toList(),
     );
   }
 }
